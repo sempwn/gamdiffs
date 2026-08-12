@@ -1,0 +1,369 @@
+# confidence_intervals_derivation
+
+## Overview
+
+Given an outcome $`Y`$ with a set of predictors $`X`$ a simple linear
+regression model is of the form,
+
+``` math
+Y = \beta X + \epsilon
+```
+where $`\epsilon`$ is a normally distributed i.i.d. random variate.
+Generalizing to multiple predictors in martix notation this can be
+described as,
+
+``` math
+\begin{equation}
+ \mathbf{Y} = \mathbf{X\beta} + \mathbf{\epsilon}.
+ (\#eq:matrix-linear-regression)
+\end{equation}
+```
+
+Where $`X`$ in Equation @ref(eq:matrix-linear-regression) is the design
+matrix of form,
+
+``` math
+\begin{equation*}
+X = \begin{bmatrix}
+  1 & x_{11} & x_{12} & \ldots & x_{1m} \\
+  \vdots & \vdots & \vdots & \ddots & \vdots \\
+  1 & x_{n1} & x_{n2} & \ldots & x_{nm}
+\end{bmatrix}.
+\end{equation*}
+```
+
+The vector of parameters is
+
+``` math
+\begin{equation*}
+\beta = \begin{bmatrix}
+  \beta_0  \\
+  \vdots\\
+  \beta_m 
+\end{bmatrix},
+\end{equation*}
+```
+
+and the vector of responses is
+
+``` math
+\begin{equation*}
+\mathbf{Y} = \begin{bmatrix}
+  Y_0  \\
+  \vdots\\
+  Y_n
+\end{bmatrix}.
+\end{equation*}
+```
+
+Combining with the pseudo-inverse leads to the following estimator for
+the coefficients,
+
+``` math
+\begin{equation}
+\hat{\beta} = (X^\intercal X)^{-1} X^\intercal Y,
+(\#eq:beta-estimator)
+\end{equation}
+```
+
+where $`X`$ is the $`n\times m`$ design matrix and $`Y`$ is the
+$`n \times 1`$ vector of responses. Given this estimator is composed of
+the random variate $`Y`$ a natural question is determining its variance.
+We can apply the variance operator to Equation @ref(eq:beta-estimator)
+and using the property of the variance,
+$`\text{Var}(AX) = A\text{Var}(X)A^\intercal`$ for a constant matrix
+$`A`$,
+
+``` math
+\begin{aligned}
+\text{Var}(\hat{\beta}) &= (X^\intercal X)^{-1} X^\intercal \text{Var}(Y) X (X^\intercal X)^{-1}, \\
+&= (X^\intercal X)^{-1} X^\intercal \sigma^2 I X (X^\intercal X)^{-1}, \\
+&= \sigma^2 (X^\intercal X)^{-1}.
+\end{aligned}
+```
+
+where we have also applied the IID assumption of the error terms
+$`\epsilon`$ with variance $`\sigma^2`$. Since this value is unknown it
+can be directly estimated from the residuals producing the final
+estimate of the variance,
+
+``` math
+\begin{equation}
+\hat{\text{Var}}(\hat{\beta}) = \hat{\sigma}^2 (X^\intercal X)^{-1}.
+\end{equation}
+```
+
+Given that the estimator for the response is $`X\hat{\beta}`$, the
+variance of the response estimator is,
+
+``` math
+\begin{aligned}
+\hat{\text{Var}}(\hat{Y}) &= X (X^\intercal X)^{-1} X^\intercal \text{Var}(Y) X (X^\intercal X)^{-1} X^\intercal, \\
+&= \hat{\sigma}^2 X (X^\intercal X)^{-1} X^\intercal.
+\end{aligned}
+```
+
+## Variance calculation for a generalized linear model
+
+A generalized linear model is an extension of a linear model that
+includes a link function $`g`$ to define the expected value of the
+response according to the following relationship,
+
+``` math
+\mathbb{E}(Y|X) = g^{-1}(X\beta)
+```
+
+The results for the variance estimator of the coefficients follows as
+above, however in order estimate the variance of the response estimator
+we need to apply the delta method for a non-linear function $`f`$
+applied to a random variable $`Z`$,
+
+``` math
+\text{Var}(f(Z)) = (\nabla f)^\intercal Var(Z) (\nabla f).
+```
+
+For a Poisson or negative binomial model $`f`$ is the exponential
+function and it follows that,
+
+``` math
+\begin{aligned}
+(\nabla f)_{ij} &= \frac{\partial}{\partial \beta_i} \exp(\sum_k \beta_k x_{kj}), \\
+&= x_{ij} \exp(\hat{y}_j).
+\end{aligned}
+```
+This can be similarly calculated for other mean functions used for other
+distributions. for example for the Bernoulli, Binomial, categorical, or
+multinomial distributions the link function is a Logit and the gradient
+for the corresponding $`f`$ is,
+
+``` math
+\begin{aligned}
+(\nabla f)_{ij} &= \frac{\partial}{\partial \beta_i} \left(1 +  \exp(\sum_k \beta_k x_{kj}) \right)^{-1}, \\
+&= x_{ij} \frac{\exp(\hat{y}_j)}{\left(1 + \exp(\hat{y}_j)\right)^2}.
+\end{aligned}
+```
+
+For an exponential of gamma distribution model the corresponding
+gradient of $`f`$ is,
+
+``` math
+\begin{aligned}
+(\nabla f)_{ij} &= \frac{\partial}{\partial \beta_i} \left(-\sum_k \beta_k x_{kj} \right)^{-1}, \\
+&=  \frac{x_{ij}}{\hat{y}_j^2}.
+\end{aligned}
+```
+
+## Incorporating a generalized additive model term
+
+Generalized Additative Models (GAMs) in addition to linear terms fit
+general spline terms based on a series of basis functions $`\phi_i`$. As
+each term in the design matrix is transformed by these basis functions
+it is straightforward to extend the above estimate of the variance for
+$`\hat{Y}`$ to a GAM with the final estimate,
+
+``` math
+\begin{equation}
+\hat{\text{Var}}(\hat{Y}) = \hat{\sigma}^2 \tilde{X} (\nabla f)^\intercal (\tilde{X}^\intercal \tilde{X})^{-1} \tilde{X}^\intercal (\nabla f).
+(\#eq:hat-var-y)
+\end{equation}
+```
+
+Where $`\tilde{X}`$ is the transformed design matrix.
+
+### Calculating the variance of the difference of random variables
+
+The variance of the difference for two random variables that are not
+independent (say $`X_1`$ and $`X_2`$),
+
+``` math
+\begin{equation}
+\text{Var}(X_1 - X_2) = \text{Var}(X_1) + \text{Var}(X_2) - 2\text{Cov}(X_1,X_2).
+\end{equation}
+```
+
+This can be calculated directly from Equation @ref(eq:hat-var-y) using
+the constant vector $`u = (1, -1)^\intercal`$ as the following quadratic
+form,
+
+``` math
+\begin{equation}
+u^\intercal \hat{\text{Var}}(\hat{Y}) u.
+(\#eq:quad-u)
+\end{equation}
+```
+
+In general a statement on the variance of some linear combination of the
+estimated value of the response $`\hat{Y}`$ can be calculated as a
+quadratic form of the variance estimator for $`\hat{Y}`$ and a constant
+vector $`u`$. For example if the goal was to calculate the difference in
+the sum of one set of responses $`\sum_{j=1}^p\hat{Y}_j`$ to another set
+of responses $`\sum_{j=p+1}^{p+q}\hat{Y}_j`$ and given the ordering of
+the responses as
+$`(\hat{Y}_1,\ldots,\hat{Y}_p,\ldots,\hat{Y}_{p+1},\ldots,\hat{Y}_{p+q})`$,
+the appropriate $`u`$ vector is,
+
+``` math
+u_i = \begin{cases}
+1, & \text{if } i \leq p \\
+-1, & \text{if } i > p
+\end{cases}.
+```
+
+The above idea can be extended given a variance-covariance matrix of the
+predictor for a vector of predicted values, where the first is treated
+as a baseline comparator and the subsequent responses are treated as the
+comparisons i.e.
+
+``` math
+\hat{Y} = (\hat{y}_0,\hat{y}_1,\ldots,\hat{y}_p),
+```
+
+and we wish to estimate the variance for $`\hat{y}_i - \hat{y}_0`$ where
+$`i \neq 0`$ then we may extend Equation @ref(eq:quad-u) to its matrix
+form,
+
+``` math
+\begin{equation}
+U^\intercal \hat{\text{Var}}(\hat{Y}) U,
+(\#eq:quad-U)
+\end{equation}
+```
+
+where
+
+``` math
+U_{ij} = \begin{cases}
+-1, & \text{if } i = 0 \\
+1, & \text{if } i = j > 0 \\
+0, & \text{otherwise}
+\end{cases}.
+```
+In long form the matrix has the following structure,
+
+``` math
+\begin{equation}
+  U = \begin{bmatrix}
+    -1 & -1 & -1 & \ldots & -1 \\
+    0 & 1 & 0 & \ldots & 0 \\
+    0 & 0 & 1 & \ldots & 0 \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & 0 & \ldots & 1
+  \end{bmatrix}.
+\end{equation}
+```
+
+the variance of the vector of differences is then the diagonal,
+
+``` math
+\begin{equation}
+\text{diag}(U^\intercal \hat{\text{Var}}(\hat{Y}) U).
+(\#eq:diag-U-var-Y)
+\end{equation}
+```
+
+In Einstein notation this is,
+
+``` math
+\left[\text{diag}(U^\intercal \hat{\text{Var}}(\hat{Y}) U)\right]_i = u_{ji}\left[\hat{\text{Var}}(\hat{Y}) \right]_{jk} u_{ki}.
+```
+
+Given that $`u_{.i}`$ matches with the $`u`$ vector for the difference
+between $`\hat{y}_0`$ and $`\hat{y}_i`$ we see the above vector
+correctly matches with the required vector of variances.
+
+## Estimating the total difference under a counterfactual scenario
+
+When estimating for a counterfactual scenario we can apply Equation
+@ref(eq:quad-u) to a set of random variables representing the baseline
+scenario and another set of random variables representing the
+counterfactual scenario. Generate a vector of random variables
+representing the baseline scenario by setting the counterfactual terms
+to zero and generating a random variable of the predicted value for
+$`Y^b`$ at each time-point $`1,\ldots,T`$ and the equivalent for the
+predicted value under the counterfactual $`Y^c`$,
+
+``` math
+Y = (Y^{b}_{1},\ldots,Y^{b}_{T},Y^{c}_{1},\ldots,Y^{c}_{T})
+```
+
+The vector $`u`$ can subsequently be defined as,
+
+``` math
+u_i = \begin{cases}
+1, & \text{if } i \leq p \\
+-1, & \text{if } i > p
+\end{cases}.
+```
+
+### Estimation of the variance for a relative difference
+
+for relative difference estimates the delta method approach can be
+extended to account for the non-linear function of the ratio of two
+random variables which is applied when calculating the relative
+difference i.e. variance estimates of the form
+
+``` math
+\text{Var}\left(\frac{Y - X}{Y}\right) = \text{Var}\left(1 - \frac{X}{Y}\right) = \text{Var}\left(\frac{X}{Y}\right).
+```
+
+Define the ratio function $`f(x,y) = x/y`$. Performing a second order
+Taylor expansion around the mean for $`X`$ and $`Y`$ provides the
+following approaximation,
+
+``` math
+\begin{aligned}
+f(x,y) &\approx f(\bar{x},\bar{y}) + f'_x(\bar{x},\bar{y})(x - \bar{x}) + f'_y(\bar{x},\bar{y})(y - \bar{y}) \\
+&+ \frac{1}{2} \left[ f''_{xx}(\bar{x},\bar{y})(x - \bar{x})^2 
++ f''_{xy}(\bar{x},\bar{y})(x - \bar{x})(y - \bar{y})
++ f''_{yy}(\bar{x},\bar{y})(y - \bar{y})^2
+\right].
+\end{aligned}
+```
+
+For estimation of the variance we can take the first order approximation
+and given the definition,
+
+``` math
+\text{Var}(f(X,Y)) = \mathbb{E}\left[ (f(X,Y) - f(\bar{x},\bar{y}))^2 \right]
+```
+
+where we use the approximation
+$`\mathbb{E}[f(X,Y)] = f(\bar{x},\bar{y})`$. Applying the first order
+Taylor approximation to the variance gives,
+
+``` math
+\begin{aligned}
+\text{Var}(f(X,Y)) &= \mathbb{E}\left[ (f(X,Y) - f(\bar{x},\bar{y}))^2 \right] \\ 
+&= \mathbb{E}\left[ \left(f(\bar{x},\bar{y}) + f'_x(\bar{x},\bar{y})(x - \bar{x}) + f'_y(\bar{x},\bar{y})(y - \bar{y}) - f(\bar{x},\bar{y}) \right)^2 \right] \\
+&= \mathbb{E}\left[ \left(f'_x(\bar{x},\bar{y})(x - \bar{x}) + f'_y(\bar{x},\bar{y})(y - \bar{y}) \right)^2 \right] \\
+&= \mathbb{E}\left[ f'_x(\bar{x},\bar{y})^2(x - \bar{x})^2 + f'_y(\bar{x},\bar{y})^2(y - \bar{y})^2 +   f'_x(\bar{x},\bar{y})f'_y(\bar{x},\bar{y})(x - \bar{x})(y - \bar{y})\right] \\
+&= f'_x(\bar{x},\bar{y})^2 \text{Var}(X) + f'_y(\bar{x},\bar{y})^2 \text{Var}(Y) + f'_x(\bar{x},\bar{y})f'_y(\bar{x},\bar{y}) \text{Cov}(X,Y)
+\end{aligned}
+```
+
+Given that $`f'_x(\bar{x},\bar{y}) = 1/\bar{y}`$ and
+$`f'_y(\bar{x},\bar{y}) = -\bar{x}/\bar{y}^2`$ we arrive at the final
+result,
+
+``` math
+\begin{aligned}
+\text{Var}(f(X,Y)) &= f'_x(\bar{x},\bar{y})^2 \text{Var}(X) + f'_y(\bar{x},\bar{y})^2 \text{Var}(Y) + f'_x(\bar{x},\bar{y})f'_y(\bar{x},\bar{y}) \text{Cov}(X,Y) \\
+&= 1/\bar{y}^2 \text{Var}(X)  + \bar{x}^2/\bar{y}^4 \text{Var}(Y) -\bar{x}/\bar{y}^3 \text{Cov}(X,Y) \\
+&= 1/\bar{y}^4 \left( \bar{y}^2\text{Var}(X)  + \bar{x}^2 \text{Var}(Y) -\bar{x}\bar{y} \text{Cov}(X,Y)  \right)
+\end{aligned}
+```
+
+## Estimating the confidence interval by sampling the posterior
+
+An alternative formulation is to consider simulating directly from the
+posterior of the coefficients,
+
+``` math
+\tilde{\beta}_i \sim N(\hat{\beta},\tilde{\Sigma}_\beta),
+```
+
+and then applying the Monte Carlo approximation to the expectation,
+
+``` math
+\mathbb{E}[\hat{Y}] = \frac{1}{n}\sum_{i=1}^{n} \exp(\tilde{X}\tilde{\beta}_i).
+```

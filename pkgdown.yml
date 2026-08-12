@@ -1,7 +1,9 @@
-pandoc: 2.7.3
-pkgdown: 2.0.6
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   confidence_intervals_derivation: confidence_intervals_derivation.html
-last_built: 2022-11-18T22:04Z
-
+last_built: 2026-08-12T19:42Z
+urls:
+  reference: https://sempwn.github.io/gamdiffs/reference
+  article: https://sempwn.github.io/gamdiffs/articles
