@@ -19,8 +19,8 @@ calc_sum_counterfactual_gam(
 
 \item{baseline_data}{data.frame of baseline predictors}
 
-\item{counter_data}{data.frame of counterfactual predictors. \code{counter_data}
-cannot be \code{NULL}}
+\item{counter_data}{data.frame of counterfactual predictors. Optional can be
+\code{NULL} which would then just calculate variance of baseline sum.}
 
 \item{ci}{range of confidence interval}
 

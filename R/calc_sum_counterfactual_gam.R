@@ -6,8 +6,8 @@
 #' based on modified code from gam predict function help
 #' @param m model object
 #' @param baseline_data data.frame of baseline predictors
-#' @param counter_data data.frame of counterfactual predictors. `counter_data`
-#' cannot be `NULL`
+#' @param counter_data data.frame of counterfactual predictors. Optional can be
+#' `NULL` which would then just calculate variance of baseline sum.
 #' @param ci range of confidence interval
 #' @param use_relative_diff provide estimates as a relative difference, otherwise
 #' presented as an absolute difference
