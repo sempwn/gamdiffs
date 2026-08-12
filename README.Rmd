@@ -86,12 +86,28 @@ improper priors) can be calculated as
 
 post_diffs <- calc_sum_counterfactual_gam(m, 
   baseline_data,
-  use_post = TRUE,
+  method = "posterior",
   nrep = 1000,
   counter_data = counter_data,
   ci = 0.95
 )
 print(post_diffs)
+```
+
+
+Although the main purpose of the package is the provide confidence intervals
+for the difference of estimates, it can also be used to provide confidence 
+intervals for the sum of estimates by just not specifying a counterfactual,
+
+```{r example 3}
+baseline_data <- dplyr::tibble(x = 0:40)
+
+test_sum <- calc_sum_counterfactual_gam(m, baseline_data,
+  counter_data = counter_data,
+  ci = 0.95
+)
+
+print(test_sum)
 ```
 
 
