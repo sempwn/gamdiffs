@@ -9,7 +9,9 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/gamdiffs)](https://CRAN.R-project.org/package=gamdiffs)
-[![R-CMD-check](https://github.com/sempwn/gamdiffs/workflows/R-CMD-check/badge.svg)](https://github.com/sempwn/gamdiffs/actions)
+[![R-CMD-check](https://github.com/sempwn/gamdiffs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sempwn/gamdiffs/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/sempwn/gamdiffs/graph/badge.svg)](https://app.codecov.io/gh/sempwn/gamdiffs)
 <!-- badges: end -->
 
 The goal of gamdiffs is to provide a set of convenience functions for
