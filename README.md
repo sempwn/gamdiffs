@@ -9,7 +9,9 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/gamdiffs)](https://CRAN.R-project.org/package=gamdiffs)
-[![R-CMD-check](https://github.com/sempwn/gamdiffs/workflows/R-CMD-check/badge.svg)](https://github.com/sempwn/gamdiffs/actions)
+[![R-CMD-check](https://github.com/sempwn/gamdiffs/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sempwn/gamdiffs/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/sempwn/gamdiffs/graph/badge.svg)](https://app.codecov.io/gh/sempwn/gamdiffs)
 <!-- badges: end -->
 
 The goal of gamdiffs is to provide a set of convenience functions for
@@ -21,9 +23,9 @@ health.
 
 Current implemented confidence interval estimates are
 
--   delta method
--   posterior sampling
--   Efron bootstrap sampling
+- delta method
+- posterior sampling
+- Efron bootstrap sampling
 
 ## Installation
 
@@ -53,7 +55,7 @@ associated confidence intervals is provided
 library(gamdiffs)
 library(mgcv)
 #> Loading required package: nlme
-#> This is mgcv 1.8-35. For overview type 'help("mgcv-package")'.
+#> This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
 ## basic usage
 res <- gamdiffs:::create_random_data()
 m <- mgcv::gam(y ~ s(x), data = res, family = poisson)
@@ -85,9 +87,10 @@ delta method. The resulting confidence interval from sampling of the
 posterior (with improper priors) can be calculated as
 
 ``` r
+
 post_diffs <- calc_sum_counterfactual_gam(m, 
   baseline_data,
-  use_post = TRUE,
+  method = "posterior",
   nrep = 1000,
   counter_data = counter_data,
   ci = 0.95
@@ -103,6 +106,30 @@ print(post_diffs)
 #> $uc
 #> 97.5% 
 #>   2.2
+```
+
+Although the main purpose of the package is the provide confidence
+intervals for the difference of estimates, it can also be used to
+provide confidence intervals for the sum of estimates by just not
+specifying a counterfactual,
+
+``` r
+baseline_data <- dplyr::tibble(x = 0:40)
+
+test_sum <- calc_sum_counterfactual_gam(m, baseline_data,
+  counter_data = counter_data,
+  ci = 0.95
+)
+
+print(test_sum)
+#> $m
+#> [1] 44
+#> 
+#> $lc
+#> [1] 30
+#> 
+#> $uc
+#> [1] 57
 ```
 
 ## Code of Conduct
