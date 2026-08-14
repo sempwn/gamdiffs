@@ -3,7 +3,7 @@ pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   confidence_intervals_derivation: confidence_intervals_derivation.html
-last_built: 2026-08-12T19:42Z
+last_built: 2026-08-14T15:40Z
 urls:
   reference: https://sempwn.github.io/gamdiffs/reference
   article: https://sempwn.github.io/gamdiffs/articles
