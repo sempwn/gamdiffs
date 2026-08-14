@@ -117,19 +117,19 @@ specifying a counterfactual,
 baseline_data <- dplyr::tibble(x = 0:40)
 
 test_sum <- calc_sum_counterfactual_gam(m, baseline_data,
-  counter_data = counter_data,
+  counter_data = NULL,
   ci = 0.95
 )
 
 print(test_sum)
 #> $m
-#> [1] 44
+#> [1] 106
 #> 
 #> $lc
-#> [1] 30
+#> [1] 85
 #> 
 #> $uc
-#> [1] 57
+#> [1] 126
 ```
 
 ## Code of Conduct

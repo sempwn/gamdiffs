@@ -104,7 +104,7 @@ intervals for the sum of estimates by just not specifying a counterfactual,
 baseline_data <- dplyr::tibble(x = 0:40)
 
 test_sum <- calc_sum_counterfactual_gam(m, baseline_data,
-  counter_data = counter_data,
+  counter_data = NULL,
   ci = 0.95
 )
 
